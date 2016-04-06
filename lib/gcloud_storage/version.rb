@@ -1,0 +1,3 @@
+module GcloudStorage
+  VERSION = "0.0.1"
+end
