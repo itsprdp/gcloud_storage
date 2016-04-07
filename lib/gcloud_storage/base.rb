@@ -2,39 +2,32 @@ require "gcloud"
 
 module GcloudStorage
   class Base
-    attr_accessor :connection
+    attr_reader :connection
 
-    def initialize(options)
-      @connection = {
-        credentials: {
-          bucket_name: options[:bucket_name],
-          project_id: options[:project_id],
-          key_file: options[:key_file]
-        }
-      }
-
-      missing_options = []
+    def initialize
+      @connection, missing_options = {}, []
 
       [:bucket_name, :project_id, :key_file].each do |option|
-        if options[option].nil? || options[option].empty?
-          missing_options << option
-        end
+        option_value = GcloudStorage.configuration.credentials[option]
+        missing_options << option if (option_value.nil? || option_value.empty?)
       end
 
       unless missing_options.empty?
         raise ArgumentError.new(":#{missing_options.join(',')} are missing")
       end
 
-      # init connection
-      self.storage
+      # Cache service, storage and bucket to @connection
+      self.bucket
+
+      # Return cached connection hash
       @connection
     end
 
     def service
       begin
         @connection[:service] ||= Gcloud.new(
-          @connection[:credentials][:project_id],
-          @connection[:credentials][:key_file]
+          GcloudStorage.configuration.credentials[:project_id],
+          GcloudStorage.configuration.credentials[:key_file]
         )
       rescue => e
         raise e
@@ -54,7 +47,9 @@ module GcloudStorage
     end
 
     def bucket
-      self.storage.bucket(@connection[:credentials][:bucket_name])
+      @connection[:bucket] ||= self.storage.bucket(
+        GcloudStorage.configuration.credentials[:bucket_name]
+      )
     end
 
     #TODO Move these methods to file class

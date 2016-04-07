@@ -23,35 +23,61 @@ Or install it yourself as:
     $ gem install gcloud_storage
 
 ## Usage
-Your ActiveRecord model file looks like this.
+Mountable ActiveRecord model configuration looks like this.
 
 ```ruby
 class TempFile < ActiveRecord::Base
-  # attribute :file
   include GcloudStorage::Uploader
 
+  # attribute :file
   mount_gcloud_uploader :file
 end
 ```
 
-And create an initializer at `config/initializers/gcloud_storage.rb` and add these
+Create an initializer file `config/initializers/gcloud_storage.rb` and add these
 lines:
 
 ```ruby
-# To support large file uploads
-Faraday.default_adapter = :httpclient
+# Uncomment this to support large file uploads
+# Faraday.default_adapter = :httpclient
 
-unless Rails.env.test?
-  GcloudStorage.configure({
-    # Storage bucket name
-    bucket_name: AppConfig.gcs['bucket_name'],
-    # Google Cloud Project ID
-    project_id: AppConfig.gcs['project_id'],
-    # Compute Service account json file
-    key_file: Rails.root.join(AppConfig.gcs['key_file_path'])
-  })
+GcloudStorage.configure do |config|
+  config.credentials = {
+    bucket_name: 'bucket_name', # Storage bucket name
+    project_id: 'project_id',   # Google Cloud Project ID
+    key_file: 'key_file_path'   # Compute Service account json file
+  }
 end
+
+# Add this to validate and cache connection object
+# while loading the Rails Application
+# GcloudStorage.initialize_service!
+
 ```
+
+Testing the file uploads.
+```
+$ rails console
+Loading development environment (Rails 4.2.0)
+ :001 > `echo "This is a test file" > temp.txt`
+ => ""
+ :002 > file = Rack::Multipart::UploadedFile.new("temp.txt")
+ => #<Rack::Multipart::UploadedFile:0x007f9e29ae37c8 @content_type="text/plain", @original_filename="temp.txt", @tempfile=#<Tempfile:/var/folders/temp.txt>>
+ :003 > temp_file = TempFile.new(file_uploader_object: file) # file_attribute => #{column}_uploader_object
+ => #<TempFile id: nil, file: "temp.txt", created_at: nil, updated_at: nil>
+ :004 > temp_file.valid?
+ => true
+ :005 > temp_file.save
+ => true
+ :006 > temp_file.file_url
+ => "https://storage.googleapis.com/<bucket-name>/uploads/temp_files/1/temp.txt?GoogleAccessId=compute%40developer.gserviceaccount.com&Expires=1459851006&Signature=XXXX"
+```
+
+## TODO
+1. Write specs
+2. Support multiple mountable columns
+3. Support overriding the mountable methods in a better way. For now the user
+   can override the methods in the model.
 
 ## Development
 
