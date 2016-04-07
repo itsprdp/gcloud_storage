@@ -2,6 +2,7 @@ require "gcloud_storage/version"
 require "gcloud_storage/configuration"
 require "gcloud_storage/base"
 require "gcloud_storage/uploader"
+require "gcloud_storage/error"
 
 module GcloudStorage
   class << self
@@ -21,7 +22,7 @@ module GcloudStorage
     if self.configuration
       self.connection ||= GcloudStorage::Base.new
     else
-      raise Exception.new("Missing credentials. Please configure using GcloudStorage.configure({}).")
+      raise GcloudStorage::ConfigurationError.new("Missing credentials. Please configure using GcloudStorage.configure(&block).")
     end
   end
 end

@@ -1,0 +1,4 @@
+gcloud:
+ project_id: ""
+ bucket_name: ""
+ key_file: "*.json"
