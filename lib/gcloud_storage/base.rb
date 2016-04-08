@@ -13,7 +13,7 @@ module GcloudStorage
 
       [:bucket_name, :project_id, :key_file].each do |option|
         option_value = options[option]
-        missing_options << option if (option_value.nil? || option_value.empty?)
+        missing_options << option if (option_value.nil? || !(option_value))
       end
 
       unless missing_options.empty?

@@ -48,8 +48,18 @@ module GcloudStorage
           file_name.gsub(/[^0-9A-z.\-]/, '_')
         end
 
+        define_method(:return_filename) do |file|
+          if file.is_a?(String)
+            file.split("/").last
+          elsif file.is_a?(Pathname)
+            file.to_s
+          elsif file.is_a?(Rack::Multipart::UploadedFile)
+            file.original_filename
+          end
+        end
+
         define_method(:init_file_name_for_column) do
-          send(:"#{column}=", sanitize_filename(send(:"#{column}_uploader_object").original_filename)) if send(:"#{column}_uploader_object").present?
+          send(:"#{column}=", sanitize_filename(return_filename(send(:"#{column}_uploader_object")))) if send(:"#{column}_uploader_object").present?
         end
       end # mount_custom_uploader
     end # ClassMethods

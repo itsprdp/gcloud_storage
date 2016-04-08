@@ -55,7 +55,12 @@ end
 
 ```
 
-Testing the file uploads.
+File upload example:
+You can pass path to the file to be uploaded as a `String` or as `Pathname` or
+as `Rack::Multipart::UploadedFile` object using HTML Multipart form.
+The attribute to initialize will be `#{column}_uploader_object`. Here the column
+name is file in the above example.
+
 ```
 $ rails console
 Loading development environment (Rails 4.2.0)
@@ -71,6 +76,16 @@ Loading development environment (Rails 4.2.0)
  => true
  :006 > temp_file.file_url
  => "https://storage.googleapis.com/<bucket-name>/uploads/temp_files/1/temp.txt?GoogleAccessId=compute%40developer.gserviceaccount.com&Expires=1459851006&Signature=XXXX"
+ :007 > `echo "Yet Another test file" > tmp/yet_another_test.txt`
+ => ""
+ :008 > another_file = TempFile.new(file_uploader_object: "tmp/yet_another_test.txt")
+ => #<TempFile id: nil, file: "yet_another_test.txt", created_at: nil, updated_at: nil>
+ :009 > another_file.save
+ => true
+ :010 > another_file.file_url
+ => "https://storage.googleapis.com/<bucket-name>/uploads/temp_files/2/yet_another_test.txt?GoogleAccessId=compute%40developer.gserviceaccount.com&Expires=1459851800&Signature=XXXX"
+ :011 > open(another_file.file_url).read
+ => "Yet Another test file\n"
 ```
 
 ## TODO
