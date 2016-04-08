@@ -66,7 +66,7 @@ describe GcloudStorage do
     it "should raise an error if the configuration returns nil" do
       TestGcloudStorage.configuration = nil
 
-      expect { TestGcloudStorage.initialize_service! }.to raise_error(GcloudStorage::ConfigurationError, /Please configure/)
+      expect { TestGcloudStorage.initialize_service! }.to raise_error(GcloudStorage::Error::Configuration, /Please configure/)
     end
   end
 end

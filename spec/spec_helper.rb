@@ -2,15 +2,21 @@ require 'bundler/setup'
 Bundler.setup
 
 require 'yaml'
+require 'fileutils'
 require 'gcloud_storage'
 
 unless File.exist?('config.yml')
   raise Exception.new('test-bucket-service.json file is missing')
 end
 
+# Load secrets
 CREDENTIALS = YAML.load_file('config.yml')["gcloud"]
 
-TestGcloudStorage = GcloudStorage
+# Test Module
+TestGcloudStorage = GcloudStorage.dup
+
+# Create tmp directory
+FileUtils.mkdir_p 'tmp'
 
 RSpec.configure do |config|
   GcloudStorage.configure do |storage_config|

@@ -10,7 +10,7 @@ module GcloudStorage
   end
 
   def self.configure
-    self.configuration ||= GcloudStorage::Configuration.new
+    self.configuration ||= Configuration.new
     yield(configuration)
   end
 
@@ -20,9 +20,9 @@ module GcloudStorage
 
   def self.initialize_service!
     if self.configuration
-      self.connection ||= GcloudStorage::Base.new
+      self.connection ||= Base.new(self.configuration.credentials)
     else
-      raise GcloudStorage::ConfigurationError.new("Missing credentials. Please configure using GcloudStorage.configure(&block).")
+      Error.missing_credentials
     end
   end
 end
