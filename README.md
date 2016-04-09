@@ -35,7 +35,7 @@ end
 
 temp_file = TempFile.new(file_uploader_object: path_to_file) # => TempFile object
 temp_file.file_url # => HTTPS URL
-temp_file.file_path # => HTTPS URL
+temp_file.file_path # => "/uploads/#{model_name}s/:id/#{attribute_name}s/filename.extension"
 ```
 
 Create an initializer file `config/initializers/gcloud_storage.rb` and add these
@@ -79,7 +79,7 @@ Loading development environment (Rails 4.2.0)
  :005 > temp_file.save
  => true
  :006 > temp_file.file_url
- => "https://storage.googleapis.com/<bucket-name>/uploads/temp_files/1/temp.txt?GoogleAccessId=compute%40developer.gserviceaccount.com&Expires=1459851006&Signature=XXXX"
+ => "https://storage.googleapis.com/<bucket-name>/uploads/temp_files/1/files/temp.txt?GoogleAccessId=compute%40developer.gserviceaccount.com&Expires=1459851006&Signature=XXXX"
  :007 > `echo "Yet Another test file" > tmp/yet_another_test.txt`
  => ""
  :008 > another_file = TempFile.new(file_uploader_object: "tmp/yet_another_test.txt")
@@ -87,11 +87,11 @@ Loading development environment (Rails 4.2.0)
  :009 > another_file.save
  => true
  :010 > another_file.file_url
- => "https://storage.googleapis.com/<bucket-name>/uploads/temp_files/2/yet_another_test.txt?GoogleAccessId=compute%40developer.gserviceaccount.com&Expires=1459851800&Signature=XXXX"
+ => "https://storage.googleapis.com/<bucket-name>/uploads/temp_files/2/files/yet_another_test.txt?GoogleAccessId=compute%40developer.gserviceaccount.com&Expires=1459851800&Signature=XXXX"
  :011 > open(another_file.file_url).read
  => "Yet Another test file\n"
  :012 > another_file.file_path
- => "uploads/temp_files/2/yet_another_test.txt"
+ => "uploads/temp_files/2/files/yet_another_test.txt"
 ```
 
 ## TODO

@@ -26,7 +26,7 @@ module GcloudStorage
         end
 
         define_method(:"#{column}_path") do
-          "uploads/#{self.class.to_s.underscore}s/#{self.id || "non_persisted"}/#{send(column.to_sym)}"
+          "uploads/#{self.class.to_s.underscore}s/#{self.id || "non_persisted"}/#{column}s/#{send(column.to_sym)}"
         end
 
         define_method(:"#{column}_url") do
