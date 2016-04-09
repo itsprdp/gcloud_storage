@@ -34,7 +34,8 @@ class TempFile < ActiveRecord::Base
 end
 
 temp_file = TempFile.new(file_uploader_object: path_to_file) # => TempFile object
-temp_file.file_url # => HTTPS URL
+temp_file.file_url # => HTTPS URL which expires in 300 seconds bye default
+temp_file.file_expirable_url(60) # => HTTPS URL which expires in 60 seconds
 temp_file.file_path # => "/uploads/#{model_name}s/:id/#{attribute_name}s/filename.extension"
 ```
 

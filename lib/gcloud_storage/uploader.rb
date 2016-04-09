@@ -30,7 +30,11 @@ module GcloudStorage
         end
 
         define_method(:"#{column}_url") do
-          GcloudStorage.service.expirable_url(send(:"#{column}_path")) if persisted?
+          expirable_gc_url(send(:"#{column}_path"))
+        end
+
+        define_method(:"#{column}_expirable_url") do |num_secs|
+          expirable_gc_url(send(:"#{column}_path"), num_secs)
         end
 
         define_method(:"upload_#{column}_file_to_gc") do
@@ -87,6 +91,14 @@ module GcloudStorage
           end
 
           private_methods << :delete_file_from_gc
+        end
+
+        unless respond_to?(:expirable_gc_url)
+          define_method(:expirable_gc_url) do |file_path, num_secs = 300|
+            GcloudStorage.service.expirable_url(file_path, num_secs) if persisted?
+          end
+
+          private_methods << :expirable_gc_url
         end
 
         private_methods.each {|method| private method}
