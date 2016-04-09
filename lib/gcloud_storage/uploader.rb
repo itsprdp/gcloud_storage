@@ -5,62 +5,91 @@ module GcloudStorage
     end
 
     module ClassMethods
-      #TODO: Support multiple columns
-      def mount_gcloud_uploader(column)
-        column = column.to_s if column.is_a?(Symbol)
+      def mount_gcloud_uploader(column, options = {}, &block)
+        private_methods = []
 
         attr_accessor :"#{column}_uploader_object"
-        attr_accessible :"#{column}_uploader_object"
 
-        after_save :"upload_#{column}_file_to_gc"
+        after_save :"upload_#{column}_file_to_gc", if: lambda { send(:"#{column}_changed?") }
         before_destroy :"delete_#{column}_file_from_gc"
 
-        after_initialize :init_file_name_for_column, if: lambda { send(:"#{column}_uploader_object").present? }
+        after_initialize :"init_file_name_for_#{column}", if: lambda { send(:"#{column}_uploader_object").present? }
 
-        validate :"#{column}_presence"
+        if options[:presence] == true
+          validate :"#{column}_presence"
 
-        define_method(:"#{column}_presence") do
-          errors.add(column,'cannot be empty. Please select a file.') unless send(column.to_sym).present?
+          define_method(:"#{column}_presence") do
+            errors.add(column,"cannot be empty. Please set a file path for :#{column}_uploader_object attribute.") unless send(column.to_sym).present?
+          end
+
+          private_methods << :"#{column}_presence"
         end
 
         define_method(:"#{column}_file_path") do
           "uploads/#{self.class.to_s.underscore}s/#{self.id || "non_persisted"}/#{send(column.to_sym)}"
         end
 
-        # TODO: Generic method to support multiple columns
         define_method(:"#{column}_url") do
           GcloudStorage.service.expirable_url(send(:"#{column}_file_path")) if persisted?
         end
 
-        # TODO: Generic method to support multiple columns
         define_method(:"upload_#{column}_file_to_gc") do
-          if send(:"#{column}_changed?") && send(:"#{column}_uploader_object")
-            GcloudStorage.service.upload_file(send(:"#{column}_uploader_object"), send(:"#{column}_file_path"))
-          end
+          upload_file_to_gc(send(:"#{column}_uploader_object"), send(:"#{column}_file_path")) if send(:"#{column}_uploader_object").present?
         end
 
-        # TODO: Generic method to support multiple columns
         define_method(:"delete_#{column}_file_from_gc") do
-          GcloudStorage.service.delete_file(send(:"#{column}_file_path")) if send(column.to_sym).present?
+          delete_file_from_gc(send(:"#{column}_file_path")) if send(column.to_sym).present?
         end
 
-        define_method(:sanitize_filename) do |file_name|
-          file_name.gsub(/[^0-9A-z.\-]/, '_')
+        define_method(:"init_file_name_for_#{column}") do
+          send(:"#{column}=", sanitize_filename(return_filename(send(:"#{column}_uploader_object"))))
         end
 
-        define_method(:return_filename) do |file|
-          if file.is_a?(String)
-            file.split("/").last
-          elsif file.is_a?(Pathname)
-            file.to_s
-          elsif file.is_a?(Rack::Multipart::UploadedFile)
-            file.original_filename
+        private_methods.push(
+          :"upload_#{column}_file_to_gc",
+          :"delete_#{column}_file_from_gc",
+          :"init_file_name_for_#{column}"
+        )
+
+        unless respond_to?(:sanitize_filename)
+          define_method(:sanitize_filename) do |file_name|
+            file_name.gsub(/[^0-9A-z.\-]/, '_')
           end
+
+          private_methods << :sanitize_filename
         end
 
-        define_method(:init_file_name_for_column) do
-          send(:"#{column}=", sanitize_filename(return_filename(send(:"#{column}_uploader_object")))) if send(:"#{column}_uploader_object").present?
+        unless respond_to?(:return_filename)
+          define_method(:return_filename) do |file|
+            if file.is_a?(String)
+              file.split("/").last
+            elsif file.is_a?(Pathname)
+              file.to_s
+            elsif file.is_a?(Rack::Multipart::UploadedFile)
+              file.original_filename
+            end
+          end
+
+          private_methods << :return_filename
         end
+
+        unless respond_to?(:upload_file_to_gc)
+          define_method(:upload_file_to_gc) do |file_path, dest_path|
+            GcloudStorage.service.upload_file(file_path, dest_path)
+          end
+
+          private_methods << :upload_file_to_gc
+        end
+
+        unless respond_to?(:delete_file_from_gc)
+          define_method(:delete_file_from_gc) do |file_path|
+            GcloudStorage.service.delete_file(file_path)
+          end
+
+          private_methods << :delete_file_from_gc
+        end
+
+        private_methods.each {|method| private method}
       end # mount_custom_uploader
     end # ClassMethods
 
