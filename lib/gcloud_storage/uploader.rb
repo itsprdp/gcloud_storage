@@ -25,20 +25,20 @@ module GcloudStorage
           private_methods << :"#{column}_presence"
         end
 
-        define_method(:"#{column}_file_path") do
+        define_method(:"#{column}_path") do
           "uploads/#{self.class.to_s.underscore}s/#{self.id || "non_persisted"}/#{send(column.to_sym)}"
         end
 
         define_method(:"#{column}_url") do
-          GcloudStorage.service.expirable_url(send(:"#{column}_file_path")) if persisted?
+          GcloudStorage.service.expirable_url(send(:"#{column}_path")) if persisted?
         end
 
         define_method(:"upload_#{column}_file_to_gc") do
-          upload_file_to_gc(send(:"#{column}_uploader_object"), send(:"#{column}_file_path")) if send(:"#{column}_uploader_object").present?
+          upload_file_to_gc(send(:"#{column}_uploader_object"), send(:"#{column}_path")) if send(:"#{column}_uploader_object").present?
         end
 
         define_method(:"delete_#{column}_file_from_gc") do
-          delete_file_from_gc(send(:"#{column}_file_path")) if send(column.to_sym).present?
+          delete_file_from_gc(send(:"#{column}_path")) if send(column.to_sym).present?
         end
 
         define_method(:"init_file_name_for_#{column}") do
