@@ -5,7 +5,7 @@ module GcloudStorage
     end
 
     module ClassMethods
-      def mount_gcloud_uploader(column, options = {}, &block)
+      def mount_gcloud_uploader(column, options = {})
         private_methods = []
 
         attr_accessor :"#{column}_uploader_object"

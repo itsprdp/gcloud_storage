@@ -11,3 +11,5 @@
 
 test-bucket-service.json
 config.yml
+
+*.db
