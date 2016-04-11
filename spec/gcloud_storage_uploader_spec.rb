@@ -1,17 +1,17 @@
 require "spec_helper"
-require "byebug"
+require "open-uri"
 
 describe GcloudStorage::Uploader do
-  context :included do
+  describe :included do
     it "should respond to ClassMethods methods" do
       expect(TempFile.respond_to?(:mount_gcloud_uploader)).to eq(true)
     end
   end
 
-  context :ClassMethods do
-    context :mount_gcloud_uploader do
+  describe :ClassMethods do
+    describe :mount_gcloud_uploader do
 
-      context :public_methods do
+      describe :public_methods do
         [
           :file_uploader_object, :file_uploader_object=,
           :file_path, :file_url, :file_expirable_url
@@ -24,7 +24,7 @@ describe GcloudStorage::Uploader do
 
       end
 
-      context :private_methods do
+      describe :private_methods do
         [
           :file_presence, :upload_file_to_gc, :delete_file_from_gc,
           :upload_file_file_to_gc, :delete_file_file_from_gc, :expirable_gc_url,
@@ -39,7 +39,56 @@ describe GcloudStorage::Uploader do
 
       context :upload_file do
         before do
+          local_file_path = "tmp/test.txt"
+          File.open(local_file_path, "w") { |file| file.write("File created by RSpec!") }
+          @temp_file = TempFile.new(file_uploader_object: local_file_path )
+          @temp_file_persisted = TempFile.create(file_uploader_object: local_file_path )
+        end
 
+        it "is invalid to have the empty file_uploader_object when the presence validation is enabled" do
+          temp_file = TempFile.new
+          expect(temp_file.valid?).to eq(false)
+          expect(temp_file.errors[:file].include?("cannot be empty. Please set a file path for :file_uploader_object attribute.")).to eq(true)
+        end
+
+        describe :file_path do
+          it "should return the non-persisted file_path if the object is not persisted" do
+            expect(@temp_file.file_path).to eq("uploads/temp_files/non_persisted/files/test.txt")
+          end
+
+          it "should return the non-persisted file_path if the object is not persisted" do
+            expect(@temp_file_persisted.file_path).to eq("uploads/temp_files/#{@temp_file_persisted.id}/files/test.txt")
+          end
+        end
+
+        describe :file_url do
+          it "should return the public url to the file" do
+            url = @temp_file_persisted.file_url
+            expect(url.include?("https://storage.googleapis.com")).to eq(true)
+            expect(url.include?("files/test.txt")).to eq(true)
+            expect(open(url).read).to eq("File created by RSpec!")
+          end
+
+          it "should return nil for non-persisted records" do
+            expect(@temp_file.file_url).to eq(nil)
+          end
+        end
+
+        describe :file_expirable_url do
+          it "should return the public url of the file with the specified expiration" do
+            url = @temp_file_persisted.file_expirable_url(10)
+            expect(url.include?("https://storage.googleapis.com")).to eq(true)
+            expect(url.include?("files/test.txt")).to eq(true)
+            expect(open(url).read).to eq("File created by RSpec!")
+          end
+
+          it "should return nil for non-persisted records" do
+            expect(@temp_file.file_expirable_url(10)).to eq(nil)
+          end
+        end
+
+        it "should initialize the file attribute with the file name and extension" do
+          expect(@temp_file.file).to eq("test.txt")
         end
       end
 

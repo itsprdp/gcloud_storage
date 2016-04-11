@@ -31,6 +31,7 @@ class CreateTempFileTable < ActiveRecord::Migration
   def up
     create_table :temp_files do |t|
       t.string :file
+      t.string :alt_file
     end
   end
 
@@ -52,7 +53,7 @@ class TempFile < ActiveRecord::Base
   include GcloudStorage::Uploader
 
   mount_gcloud_uploader :file, presence: true
-  mount_gcloud_uploader :alt_file, presence: true
+  mount_gcloud_uploader :alt_file
 end
 
 RSpec.configure do |config|
