@@ -97,9 +97,8 @@ Loading development environment (Rails 4.2.0)
 ```
 
 ## TODO
-1. Write specs
-2. Support multiple mountable columns
-3. Support overriding the mountable methods in a better way. For now the user
+1. More specs for GcloudStorage::Uploader
+2. Support overriding the mountable methods in a better way. For now the user
    can override the methods in the model.
 
 ## Development
