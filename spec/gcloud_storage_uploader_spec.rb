@@ -17,7 +17,6 @@ describe GcloudStorage::Uploader do
           :file_path, :file_url, :file_expirable_url
         ].each do |msg|
           it "should respond to #{msg}" do
-            byebug if msg == :upload_file_to_gc
             expect(TempFile.new.respond_to?(msg)).to eq(true)
           end
         end

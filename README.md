@@ -1,4 +1,4 @@
-# GcloudStorage [![Gem Version](https://badge.fury.io/rb/gcloud_storage.svg)](https://badge.fury.io/rb/gcloud_storage)
+# GcloudStorage [![Gem Version](https://badge.fury.io/rb/gcloud_storage.svg)](https://badge.fury.io/rb/gcloud_storage) [![Build Status](https://travis-ci.org/itsprdp/gcloud_storage.svg?branch=master)](https://travis-ci.org/itsprdp/gcloud_storage)
 
 Simple Google Cloud Storage file upload gem for Ruby. This is an alternative gem
 for carrierwave with fog. As, carrierwave with fog only uses API Key
