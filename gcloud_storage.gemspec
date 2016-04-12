@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Simple Google Cloud Storage file upload gem for Ruby.}
   spec.description   = %q{Simple Google Cloud Storage file upload gem for Ruby. You can use this as an alternative to carrierwave with fog.}
-  spec.homepage      = "https://github.com/itsprdp/google-cloud-storage"
+  spec.homepage      = "https://github.com/itsprdp/gcloud_storage"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

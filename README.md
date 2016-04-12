@@ -1,4 +1,4 @@
-# GcloudStorage
+# GcloudStorage [![Gem Version](https://badge.fury.io/rb/gcloud_storage.svg)](https://badge.fury.io/rb/gcloud_storage)
 
 Simple Google Cloud Storage file upload gem for Ruby. This is an alternative gem
 for carrierwave with fog. As, carrierwave with fog only uses API Key
@@ -105,7 +105,11 @@ Loading development environment (Rails 4.2.0)
 
 After checking out the repo, run `bin/setup` to install dependencies. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. To
+run specs locally you need to setup a service account on google cloud project
+and add the service json file to the root directory as
+`test-bucket-service.json` and create `config.yml` from `config.yml.example`
+and fill in the appropriate values.
 
 ## Contributing
 
