@@ -6,7 +6,8 @@ module GcloudStorage
       @credentials = {
         project_id: "",
         bucket_name: "",
-        key_file: ""
+        key_file: nil,
+        compute_instance: nil
       }
     end
   end

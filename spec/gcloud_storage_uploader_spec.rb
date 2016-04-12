@@ -2,6 +2,22 @@ require "spec_helper"
 require "open-uri"
 
 describe GcloudStorage::Uploader do
+  before do
+    GcloudStorage.configuration = nil
+    GcloudStorage.connection = nil
+
+    GcloudStorage.configure do |storage_config|
+      storage_config.credentials = {
+        project_id: CREDENTIALS["project_id"],
+        bucket_name: CREDENTIALS["bucket_name"],
+        key_file: CREDENTIALS["key_file"]
+      }
+    end
+
+    # Init connection
+    GcloudStorage.initialize_service!
+  end
+
   describe :included do
     it "should respond to ClassMethods methods" do
       expect(TempFile.respond_to?(:mount_gcloud_uploader)).to eq(true)
@@ -55,7 +71,7 @@ describe GcloudStorage::Uploader do
             expect(@temp_file.file_path).to eq("uploads/temp_files/non_persisted/files/test.txt")
           end
 
-          it "should return the non-persisted file_path if the object is not persisted" do
+          it "should return the file_path with the object id" do
             expect(@temp_file_persisted.file_path).to eq("uploads/temp_files/#{@temp_file_persisted.id}/files/test.txt")
           end
         end

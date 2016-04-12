@@ -1,7 +1,23 @@
 require 'spec_helper'
 require 'open-uri'
 
-describe GcloudStorage::Base do
+describe "GcloudStorage::Base for Gcloud" do
+  before do
+    GcloudStorage.configuration = nil
+    GcloudStorage.connection = nil
+
+    GcloudStorage.configure do |storage_config|
+      storage_config.credentials = {
+        project_id: CREDENTIALS["project_id"],
+        bucket_name: CREDENTIALS["bucket_name"],
+        key_file: CREDENTIALS["key_file"]
+      }
+    end
+
+    # Init connection
+    GcloudStorage.initialize_service!
+  end
+
   [
     :storage, :bucket, :service,
     :expirable_url, :upload_file, :delete_file
