@@ -57,7 +57,7 @@ module GcloudStorage
 
         unless respond_to?(:sanitize_filename)
           define_method(:sanitize_filename) do |file_name|
-            file_name.gsub(/[^0-9A-z.\-]/, '_')
+            file_name.gsub(/[^0-9A-z.\-]/, '_') if file_name
           end
 
           private_methods << :sanitize_filename
@@ -69,7 +69,7 @@ module GcloudStorage
               file.split("/").last
             elsif file.is_a?(Pathname)
               file.to_s
-            elsif file.is_a?(Rack::Multipart::UploadedFile)
+            elsif file.respond_to?(:original_filename)
               file.original_filename
             end
           end
