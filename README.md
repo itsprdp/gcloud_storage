@@ -1,4 +1,4 @@
-# GcloudStorage [![Gem Version](https://badge.fury.io/rb/gcloud_storage.svg)](https://badge.fury.io/rb/gcloud_storage) [![Build Status](https://travis-ci.org/itsprdp/gcloud_storage.svg?branch=master)](https://travis-ci.org/itsprdp/gcloud_storage)
+# GcloudStorage [![Gem Version](https://badge.fury.io/rb/gcloud_storage.svg)](https://badge.fury.io/rb/gcloud_storage) [![Build Status](https://travis-ci.org/itsprdp/gcloud_storage.svg?branch=master)](https://travis-ci.org/itsprdp/gcloud_storage) [![Coverage Status](https://coveralls.io/repos/github/itsprdp/gcloud_storage/badge.svg?branch=compute_instances)](https://coveralls.io/github/itsprdp/gcloud_storage?branch=compute_instances)
 
 Simple Google Cloud Storage file upload gem for Ruby. This is an alternative gem
 for carrierwave with fog. As, carrierwave with fog only uses API Key
@@ -23,8 +23,8 @@ Or install it yourself as:
     $ gem install gcloud_storage
 
 ## Usage
-Mountable ActiveRecord model configuration looks like this.
 
+Model:
 ```ruby
 class TempFile < ActiveRecord::Base
   include GcloudStorage::Uploader
@@ -32,7 +32,23 @@ class TempFile < ActiveRecord::Base
   # attribute :file
   mount_gcloud_uploader :file #[, presence: true] #=> Run's presence validation
 end
+```
 
+Migration:
+```ruby
+class CreateTempFiles < ActiveRecord::Migration
+  def change
+    create_table :temp_files do |t|
+      t.string :file
+
+      t.timestamps null: false
+    end
+  end
+end
+```
+
+Attachment Methods:
+```ruby
 temp_file = TempFile.new(file_uploader_object: path_to_file) # => TempFile object
 tempfile.save
 temp_file.file_url # => HTTPS URL which expires in 300 seconds bye default
@@ -43,6 +59,7 @@ temp_file.file_path # => "/uploads/#{model_name}s/:id/#{attribute_name}s/filenam
 Create an initializer file `config/initializers/gcloud_storage.rb` and add these
 lines:
 
+For remote storage:
 ```ruby
 # Uncomment this to support large file uploads
 # Faraday.default_adapter = :httpclient
@@ -58,7 +75,19 @@ end
 # Add this to validate and cache connection object
 # while loading the Rails Application
 # GcloudStorage.initialize_service!
+```
 
+For local storage:
+```ruby
+GcloudStorage.configure do |config|
+  config.credentials = {
+    storage: :local_store
+  }
+end
+
+# Add this to validate and cache connection object
+# while loading the Rails Application
+# GcloudStorage.initialize_service!
 ```
 
 File upload example:

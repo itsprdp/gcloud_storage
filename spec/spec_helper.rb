@@ -6,6 +6,9 @@ require 'fileutils'
 require 'gcloud_storage'
 require 'active_record'
 require 'sqlite3'
+require 'coveralls'
+
+Coveralls.wear!
 
 unless File.exist?('config.yml')
   raise Exception.new('test-bucket-service.json file is missing')
@@ -54,17 +57,4 @@ class TempFile < ActiveRecord::Base
 
   mount_gcloud_uploader :file, presence: true
   mount_gcloud_uploader :alt_file
-end
-
-RSpec.configure do |config|
-  GcloudStorage.configure do |storage_config|
-    storage_config.credentials = {
-      project_id: CREDENTIALS["project_id"],
-      bucket_name: CREDENTIALS["bucket_name"],
-      key_file: CREDENTIALS["key_file"]
-    }
-  end
-
-  # Init connection
-  GcloudStorage.initialize_service!
 end

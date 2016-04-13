@@ -1,6 +1,22 @@
 require 'spec_helper'
 
 describe GcloudStorage do
+  before do
+    GcloudStorage.configuration = nil
+    GcloudStorage.connection = nil
+
+    GcloudStorage.configure do |storage_config|
+      storage_config.credentials = {
+        project_id: CREDENTIALS["project_id"],
+        bucket_name: CREDENTIALS["bucket_name"],
+        key_file: CREDENTIALS["key_file"]
+      }
+    end
+
+    # Init connection
+    GcloudStorage.initialize_service!
+  end
+
   [
     :configuration, :connection,
     :configure, :service,
