@@ -33,6 +33,15 @@ module GcloudStorage
           expirable_gc_url(send(:"#{column}_path"))
         end
 
+        define_method(:"#{column}_exists?") do
+          begin
+            send("#{column}_url".to_sym)
+            return true
+          rescue Gcloud::Storage::ApiError => error
+            raise error if error.code != 404
+          end
+        end
+
         define_method(:"#{column}_expirable_url") do |num_secs|
           expirable_gc_url(send(:"#{column}_path"), num_secs)
         end
