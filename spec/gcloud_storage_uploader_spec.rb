@@ -89,6 +89,22 @@ describe GcloudStorage::Uploader do
           end
         end
 
+        describe :file_exists? do
+          it "should return true if file exists" do
+            expect(@temp_file.file_exists?).to be_truthy
+          end
+
+          it "should return false if file is not found" do
+            allow(@temp_file).to receive(:file_url).and_raise(Gcloud::Storage::ApiError.new("Not Found", 404, []))
+            expect(@temp_file.file_exists?).to be_falsey
+          end
+
+          it "should raise errors other then ApiError" do
+            allow(@temp_file).to receive(:file_url).and_raise("DummyError")
+            expect{@temp_file.file_exists?}.to raise_error
+          end
+        end
+
         describe :file_expirable_url do
           it "should return the public url of the file with the specified expiration" do
             url = @temp_file_persisted.file_expirable_url(10)
