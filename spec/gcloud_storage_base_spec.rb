@@ -152,7 +152,7 @@ describe "GcloudStorage::Base for Gcloud" do
       it "should delete the specified file from the bucket" do
         status = GcloudStorage.service.delete_file(@remote_file_path)
         expect(status).to eq(true)
-        expect { GcloudStorage.service.delete_file(@remote_file_path) }.to raise_error(Google::Cloud::Error,/Not Found/)
+        expect { GcloudStorage.service.delete_file(@remote_file_path) }.to raise_error
       end
     end
   end
