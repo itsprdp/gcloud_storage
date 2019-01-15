@@ -53,15 +53,15 @@ describe "GcloudStorage::Base for Gcloud" do
     end
 
     it "should cache the Gcloud#service object" do
-      expect(GcloudStorage.service.connection[:service].class).to eq(Object)
+      expect(GcloudStorage.service.connection[:service].class).to eq(Google::Cloud::Storage::Project)
     end
 
     it "should cache the Gcloud#storage object" do
-      expect(GcloudStorage.service.connection[:storage].class).to eq(Gcloud::Storage::Project)
+      expect(GcloudStorage.service.connection[:storage].class).to eq(Google::Cloud::Storage::Project)
     end
 
     it "should cache the Gcloud#bucket object" do
-      expect(GcloudStorage.service.connection[:bucket].class).to eq(Gcloud::Storage::Bucket)
+      expect(GcloudStorage.service.connection[:bucket].class).to eq(Google::Cloud::Storage::Bucket)
     end
   end
 
@@ -72,7 +72,7 @@ describe "GcloudStorage::Base for Gcloud" do
 
     context :service do
       it "should return a Gcloud object" do
-        expect(@gcloud.service.class).to eq(Object)
+        expect(@gcloud.service.class).to eq(Google::Cloud::Storage::Project)
       end
 
       it "should create a new Gcloud object only if it's not cached" do
@@ -83,7 +83,7 @@ describe "GcloudStorage::Base for Gcloud" do
 
     context :storage do
       it "should return a Gcloud::Storage::Project object" do
-        expect(@gcloud.storage.class).to eq(Gcloud::Storage::Project)
+        expect(@gcloud.storage.class).to eq(Google::Cloud::Storage::Project)
       end
 
       it "should create a new Gcloud::Storage::Project object only if it's not cached" do
@@ -93,11 +93,11 @@ describe "GcloudStorage::Base for Gcloud" do
     end
 
     context :bucket do
-      it "should return a Gcloud::Storage::Bucket object" do
-        expect(@gcloud.bucket.class).to eq(Gcloud::Storage::Bucket)
+      it "should return a Google::Cloud::Storage::Bucket" do
+        expect(@gcloud.bucket.class).to eq(Google::Cloud::Storage::Bucket)
       end
 
-      it "should create a new Gcloud::Storage::Bucket object only if it's not cached" do
+      it "should create a new Google::Cloud::Storage::Bucket object only if it's not cached" do
         cached_object_id = @gcloud.bucket.object_id
         expect(@gcloud.bucket.object_id).to eq(cached_object_id)
       end
@@ -116,7 +116,7 @@ describe "GcloudStorage::Base for Gcloud" do
     context :upload_file do
       it "should upload the file to the Gcloud#storage bucket" do
         remote_file = GcloudStorage.service.upload_file(@local_file_path, @remote_file_path)
-        expect(remote_file.class).to eq(Gcloud::Storage::File)
+        expect(remote_file.class).to eq(Google::Cloud::Storage::File)
       end
 
       it "should upload the file with exact contents" do
@@ -152,7 +152,7 @@ describe "GcloudStorage::Base for Gcloud" do
       it "should delete the specified file from the bucket" do
         status = GcloudStorage.service.delete_file(@remote_file_path)
         expect(status).to eq(true)
-        expect { GcloudStorage.service.delete_file(@remote_file_path) }.to raise_error(Gcloud::Storage::ApiError,/Not Found/)
+        expect { GcloudStorage.service.delete_file(@remote_file_path) }.to raise_error(Google::Cloud::Error,/Not Found/)
       end
     end
   end
