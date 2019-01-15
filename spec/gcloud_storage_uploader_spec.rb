@@ -30,7 +30,7 @@ describe GcloudStorage::Uploader do
       describe :public_methods do
         [
           :file_uploader_object, :file_uploader_object=,
-          :file_path, :file_url, :file_expirable_url
+          :file_path, :file_url, :file_expirable_url, :file_exists?
         ].each do |msg|
           it "should respond to #{msg}" do
             expect(TempFile.new.respond_to?(msg)).to eq(true)
@@ -91,17 +91,11 @@ describe GcloudStorage::Uploader do
 
         describe :file_exists? do
           it "should return true if file exists" do
-            expect(@temp_file.file_exists?).to be_truthy
+            expect(@temp_file_persisted.file_exists?).to be_truthy
           end
 
           it "should return false if file is not found" do
-            allow(@temp_file).to receive(:file_url).and_raise(Gcloud::Storage::ApiError.new("Not Found", 404, []))
             expect(@temp_file.file_exists?).to be_falsey
-          end
-
-          it "should raise errors other then ApiError" do
-            allow(@temp_file).to receive(:file_url).and_raise("DummyError")
-            expect{@temp_file.file_exists?}.to raise_error
           end
         end
 
