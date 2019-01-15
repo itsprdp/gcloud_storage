@@ -1,4 +1,4 @@
-require "gcloud"
+require "google/cloud/storage"
 require "gcloud_storage/configuration"
 require "gcloud_storage/error"
 require "gcloud_storage/local_store"
@@ -41,7 +41,10 @@ module GcloudStorage
           if storage_type == :local_store
             LocalStore.new
           else
-            Gcloud.new(@connection[:credentials][:project_id], @connection[:credentials][:key_file])
+            Google::Cloud::Storage.new(
+              project_id: @connection[:credentials][:project_id],
+              credentials: @connection[:credentials][:key_file]
+            )
           end
       rescue => e
         raise e
@@ -52,7 +55,7 @@ module GcloudStorage
       @connection[:storage] ||= (
         begin
           tries ||= 3
-          self.service.storage
+          self.service
         rescue => e
           retry unless (tries -= 1).zero?
           raise e
@@ -98,7 +101,13 @@ module GcloudStorage
         file = self.bucket.file(file_path)
         file.delete
       rescue => e
-        raise e
+        if e.class == NoMethodError
+          raise Google::Cloud::Error.new(
+            "Not Found: The object you specified doesn't exist!"
+          )
+        else
+          raise e
+        end
       end
     end
   end # Base

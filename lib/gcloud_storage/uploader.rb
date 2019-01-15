@@ -34,12 +34,7 @@ module GcloudStorage
         end
 
         define_method(:"#{column}_exists?") do
-          begin
-            send("#{column}_url".to_sym)
-            return true
-          rescue Gcloud::Storage::ApiError => error
-            raise error if error.code != 404
-          end
+          send("#{column}_url".to_sym).present?
         end
 
         define_method(:"#{column}_expirable_url") do |num_secs|
