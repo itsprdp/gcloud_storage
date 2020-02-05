@@ -30,16 +30,12 @@ ActiveRecord::Base.establish_connection(
 )
 
 # TempFile Migration class
-class CreateTempFileTable < ActiveRecord::Migration
-  def up
+class CreateTempFileTable < ActiveRecord::Migration[4.2]
+  def change
     create_table :temp_files do |t|
       t.string :file
       t.string :alt_file
     end
-  end
-
-  def down
-    drop_table :temp_files
   end
 end
 
