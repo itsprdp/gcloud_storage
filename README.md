@@ -11,7 +11,12 @@ where you don't have to initialize the gem with the credentials.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'gcloud_storage'
+gem 'gcloud_storage', '0.0.4'
+```
+
+If you're using rails 5.0 and above then
+```ruby
+gem 'gcloud_storage', '0.0.5'
 ```
 
 And then execute:
