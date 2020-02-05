@@ -10,7 +10,7 @@ module GcloudStorage
 
         attr_accessor :"#{column}_uploader_object"
 
-        after_save :"upload_#{column}_file_to_gc", if: lambda { send(:"#{column}_changed?") }
+        after_save :"upload_#{column}_file_to_gc", if: lambda { send(:"saved_change_to_#{column}?") }
         before_destroy :"delete_#{column}_file_from_gc"
 
         after_initialize :"init_file_name_for_#{column}", if: lambda { send(:"#{column}_uploader_object").present? }
